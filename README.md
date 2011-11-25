@@ -96,7 +96,7 @@ An inheritance example, creating a feed service for Twitter Retweets based on th
 ``` js
 $.fn.socialfeed.add("twitter-retweets", "twitter", {
 	url: function( account, perPage, pageNo ){
-		return protocol  + "//api.twitter.com/1/statuses/retweeted_by_user.json?screen_name="+account+"&count="+(perPage*pageNo)+"&trim_user=1"
+		return "//api.twitter.com/1/statuses/retweeted_by_user.json?screen_name="+account+"&count="+(perPage*pageNo)+"&trim_user=1"
 	}
 });
 ```
