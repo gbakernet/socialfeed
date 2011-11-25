@@ -57,9 +57,8 @@ API
 
 Social Feed is extensible in a sense that you can display any feed. It is not limited to Facebook and Twitter.
 
-+ **add** - `$.fn.socialfeed.add( serviceName, implementation )`
-This will add a service implementation to the plugin core. It can be used with the option `service`
-** Use trusted sources as yet it doesn't try to strip any html from the feeds **
++ **add** - `$.fn.socialfeed.add( serviceName, serviceParentName?, implementation )`
+This will add a service implementation to the plugin core. It can be used with the option `service`. ** Use trusted sources as, it doesn't yet strip any html from the feeds **
 
 An example
 
@@ -114,7 +113,7 @@ The same factory function used by the `fn` plugin function
 AMD
 ---
 
-This plugin `define()`s itself as per the AMD module spec.
+This plugin will `define()` itself as per the AMD module spec.
 
 
 Bug tracker

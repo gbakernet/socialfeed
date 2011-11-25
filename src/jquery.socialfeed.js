@@ -2,7 +2,7 @@
  * Social Feed - version: 0.1
  * https://github.com/nextdigital/socialfeed
  *
- * Copyright 2011, John Resig
+ * Copyright (c) 2011 Next Digital Group Pty Ltd
  * Licensed under the MIT license.
  * https://github.com/nextdigital/socialfeed/blob/master/LICENSE
  * 
