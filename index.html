@@ -1,1 +1,83 @@
-My GitHub Page
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Social Feeds</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
+	<script type="text/javascript" src="https://raw.github.com/nextdigital/socialfeed/master/src/jquery.socialfeed.js"></script>
+	<style>
+	.active A {color:#000;}
+	.disabled A {color:#ccc;}
+	body {font-family: Arial, "Sans Serif"; font-size:75%;}
+	.jsf-items {width:300px; margin:10px 10px 0px 10px; padding:4px; list-style:none;}
+	.jsf-items li { overflow:hidden; margin:2px; padding:10px; background:#eee; border 1px solid #ccc:}
+	.jsf-pagination { width:300px; display:block; text-align:center; margin:0px 10px 10px 10px; padding:4px; list-style:none;}
+	.jsf-pagination li { display:inline; margin:0px; padding:6px 4px;}
+	</style>
+	<script type="text/javascript">
+		//Creating a localhost workaround for lack of facebook OAuth Token in the demo
+		 $.fn.socialfeed.add("fbLocal", "facebook",{
+			xhrType : 'json',
+			url: "fb-sample.js" 
+		});
+
+		$(document).ready(function() {
+
+			//Twitter Status Example
+			$(".twitterfeeds").socialfeed({
+				service: 'twitter',
+				account: 'twitter',
+				loadingText: "Loading Twitter feeds..."
+			});
+			
+			//Twitter Status Example
+			$(".twittersearchfeed").socialfeed({
+				service: 'twittersearch',
+				account: '#cats',
+				messagesPerPage: 4,
+				totalPages: 3,
+				loadingText: "Loading cats from Twitter...",
+				pagePrevLabel: 'Previous',
+				pageNextLabel: 'Next',
+				pageLabel: 'Page {0}'
+			});
+		
+			//Facebook Status Example
+			$(".facebookfeeds").socialfeed({
+				service: 'fbLocal', // normally use here "facebook", but have Oauth 'token'
+				account: 'facebook',
+				messagesPerPage: 5,
+				totalPages: 3,
+				loadingText: "Loading Facebook feeds...",
+				maxCharDisplay: 100,
+				token: 'TOKEN_GOES_HERE',
+				success:  function() {
+					$(this).before('<p>Done loading</p>')
+				}
+			});
+
+		});
+	</script>
+
+</head>
+<body>
+	<h1>Social Feed Demo</h1>
+	<p>See the <a href="custom.html">custom feed demo</a></p>
+	<hr />	
+	<h2>Facebook (requires OAuth token)</h2>
+	<div class="facebookfeeds"></div>
+	<hr />
+	<h2>Twitter User</h2>
+	<div class="twitterfeeds"></div>
+	<hr />
+	<h2>Twitter Search</h2>
+	<div class="twittersearchfeed"></div>
+	<hr />
+	<p>
+		See the <a href="custom.html">custom feed demo</a>
+		<br /><br />
+		<a href="https://github.com/nextdigital/socialfeed">Contribute on Github</a>
+	</p>
+	
+</body>
+</html>
