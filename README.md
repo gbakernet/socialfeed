@@ -102,7 +102,7 @@ $.fn.socialfeed.add("twitter-retweets", "twitter", {
 ```
 
 + **parseTime** - `$.fn.socialfeed.add( type?, timeString )`
-A helper function for parseing the time strings
+A helper function for parsing the time strings
 
 + **moment** - `$.fn.socialfeed.moment( timeValue )`
 A helper function for creating descriptive time, eg. "about 1 second ago"
