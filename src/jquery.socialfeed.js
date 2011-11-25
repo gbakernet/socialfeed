@@ -30,12 +30,12 @@
 			service: 'twitter', // default service - available options: facebook twitter
 			account: 'twitter', // default account
 			firstMessageMarkerClass: 'active',
+			totalPages: 3,
 			messagesPerPage: 4,
+			maxCharDisplay: 140,
 			readMoreText: 'read more',
 			loadingText: 'Loading..',
 			nothingText: "Nothing",			
-			totalPages: 3,
-			maxCharDisplay: 140,
 			pagePrevLabel: 'Prev',
 			pageNextLabel: 'Next',
 			pageLabel: '{0}'
@@ -415,15 +415,15 @@
 						"</li>",
 						(function() {
 							var i, html = '', classname;
-								for (var i = 1; i <= pagesNeeded; i++) {
-									classname = 'page' + (i === 1 ? ' first' : (i === pagesNeeded ? ' last' : ""));
-									html += ["<li class='"+classname+"'>",
-												"<a href='#page"+i+"' data-pageindex='"+i+"'>",
-													options.pageLabel.replace("{0}", i),
-												"</a>",
-											"</li>"].join('');
-								}
-								return html;
+							for (var i = 1; i <= pagesNeeded; i++) {
+								classname = 'page' + (i === 1 ? ' first' : (i === pagesNeeded ? ' last' : ""));
+								html += ["<li class='"+classname+"'>",
+											"<a href='#page"+i+"' data-pageindex='"+i+"'>",
+												options.pageLabel.replace("{0}", i),
+											"</a>",
+										"</li>"].join('');
+							}
+							return html;
 						}()),
 						"<li class='next'>",
 							"<a href='#next'>",

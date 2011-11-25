@@ -111,7 +111,7 @@ $(document).ready(function(){
 
 		
 	test("Plugin - Test 1", function() {
-	
+		expect(5);
 		var social1 = $('#social1');
 		currentMockData = [
 			{
@@ -127,65 +127,64 @@ $(document).ready(function(){
 			}
 		];
 		social1.socialfeed();
-		
-		equals( social1.selector, '#social1', "returns this");
-		ok( social1.data("socialfeed"), "socialfeed widget in the data attr");
-
+		stop();
+		setTimeout( function() {
+			equals( social1.selector, '#social1', "returns this");
+			ok( social1.data("socialfeed"), "socialfeed widget in the data attr");
+			equals( social1.find('.jsf-items > li').length, 2, "There are items in the feed" );
+			equals( social1.find('.jsf-items > :visible').length, 2, "The first 2 are visible is length" );
+			equals( social1.find('.jsf-pagination li').length, 0, "No Pagination required" );
+			start();
+		}, 3e2 );
 	});
 
 	test("Plugin - Test 2", function() {
+		expect(9);
 		var social2 = $('#social2');		
 		stop();
 		social2.socialfeed({
 			service: "mockAjax",			
-			success: function() {
-				
+			success: function() {				
 				equals( social2.selector, '#social2', "returns this");
-				equals( social2.find('.jsf-items > li').length, 6, "There is length" );
-				
-				start();
+				equals( social2.find('.jsf-items > li').length, 6, "There are items in the feed" );
+				equals( social2.find('.jsf-items > li:lt(4):visible').length, 4, "The first 4 are visible is length" );
+				equals( social2.find('.jsf-pagination .prev').length, 1, "Prev" );
+				equals( social2.find('.jsf-pagination .page').length, 2, "2 Pages" );
+				equals( social2.find('.jsf-pagination .page.first.active').length, 1, "First page is active" );
+				equals( social2.find('.jsf-pagination .next').length, 1,"Next" );				
+				social2.find('.jsf-pagination .page:eq(1) a').trigger('click');
+				setTimeout( function() {
+					equals( social2.find('.jsf-pagination .page.last.active').length, 1 , "Second page now is active" );
+					equals( social2.find('.jsf-items > li:gt(3):visible').length, 2, "There last 2 are visible" );
+					start();
+				}, 1e2 );
 			}
-		});		
+		});
 	});
 	
 	test("Plugin - Test 3", function() {
+		expect(2);
 		var social3 = $('#social3');		
-		currentMockData = [
-			{
-				"id": 1,
-				"text": "Lorem Ipsum",
-				"time": "",
-				"url": "http://www.example.com/link1"
-			},{
-				"id": 2,
-				"text": "Lorem Ipsum",
-				"time": "",
-				"url": "http://www.example.com/link2"
-			}
-		];
 		stop();
 		social3.socialfeed({
-			service: "mockData",			
-			success: function() {
-				
+			service: "mockAjax",
+			success: function() {				
 				equals( social3.selector, '#social3', "returns this");
-				equals( social3.find('.jsf-items > li').length, 2, "There is length" );
-				
+				equals( social3.find('.jsf-items > li').length, 6, "There is length" );
 				start();
 			}
 		});		
 	});
 	
 	test("Plugin - Test 4", function() {
-		var social3 = $('#social3');		
+		expect(2);
+		var social4 = $('#social4');		
 		stop();
-		social3.socialfeed({
+		social4.socialfeed({
 			service: "mockDataFail",			
-			error: function() {
-				
-				equals( social3.selector, '#social3', "returns this");
-				equals( social3.find('.jsf-items > .nothing').length, 1, "No results message" );
-				
+			error: function() {				
+				equals( social4.selector, '#social4', "returns this");
+				equals( social4.find('.jsf-items > .nothing').length, 1, "No results message" );				
 				start();
 			}
 		});		
