@@ -1,5 +1,5 @@
 /* 
- * Social Feed - version: 0.1
+ * Social Feed - version: 0.1.1
  * https://github.com/nextdigital/socialfeed
  *
  * Copyright (c) 2011 Next Digital Group Pty Ltd
@@ -17,6 +17,7 @@
  */
 (function(global) {
 
+	// If not in AMD environment, then execute immediately
 	var define = global.define || function( dep, fn ) { fn( global.jQuery ); };
 
 	// The module definition in AMD format
@@ -33,39 +34,67 @@
 			totalPages: 3,
 			messagesPerPage: 4,
 			maxCharDisplay: 140,
-			readMoreText: 'read more',
+			readMoreText: 'Read more',
 			loadingText: 'Loading..',
-			nothingText: "Nothing",			
+			nothingText: 'Nothing',
+			maxCharText: '... ',
 			pagePrevLabel: 'Prev',
 			pageNextLabel: 'Next',
 			pageLabel: '{0}'
 		},
 		
-		//protocol
+		// Locals
 		protocol = document.location.protocol,
+		rLink = /(href="|<a.*?>)?[A-Za-z]+:\/\/[A-Za-z0-9-_]+\.[A-Za-z0-9-_:%&\?\/.=]+/g,
+		rStop = /[.]?\s?$/i,
 				
+		/*
+		 * Simple Template Helper Function
+		 */
+		template = (function(){
+		
+			var template = {
+				link: '<a href="%URL%" target="_blank">%TEXT%</a>',
+				readmore: ' <span class="readmore">%LINK%</span>',
+				listitem: '<li><div class="content">%TEXT% %READMORE%</div><div class="time">%LINK%</div></li>'
+			},
+		
+			// Prop could be a key to template or a String template itself
+			exports = function( prop, data ) {
+				return ( prop in template ? template[prop] : prop ).replace( /%([A-Z]*?)%/g, function(m, g) {
+					var key = g.toLowerCase();
+					
+					// Replace with properties value or call a sub template 
+					return key in template ? exports( key, data[key] ) : data[key];
+				});
+			};
+			
+			exports.add = function( prop, value ) {
+				template[prop] = value;
+			}
+		
+			return exports;
+		}()),
+		
 		//Abstract Implementation 
 		masterService = {
 			/*
 			 * Adjusts URLs to be <a> tags
-			 * TODO rewrite this method, cache RegEx and better HTML templating
 			 */
 			linkify: function( text, url ){
+
+				text = truncate( text, this.options.maxCharDisplay, this.options.maxCharText );
 				
-				var limit = this.options.maxCharDisplay;
-				
-				// Slice
-				if( text.length > limit && url ) {
-					text = text.slice(0, (text.slice(0, limit)).lastIndexOf(" ")) + '... <span class="readmore"><a href="'+url+'" target="_blank">'+this.options.readMoreText+'</a></span>';
-				}
-				
-				// Link
-				text = text.replace(/(href="|<a.*?>)?[A-Za-z]+:\/\/[A-Za-z0-9-_]+\.[A-Za-z0-9-_:%&\?\/.=]+/g, function($0, $1) {
-					return $1 ? $0 : "<a href='"+$0+"' target='_blank'>"+$0+"</a>";
+				// Make URLs links
+				text = text.replace(rLink, function(fullMatch, hrefMatch) {
+					return hrefMatch ? fullMatch : template('link', {
+						url: fullMatch,
+						text: fullMatch
+					});
 				});
 				
-				// BR
-				return text.replace("\n","<br />");
+				// Lines
+				return text.replace( rStop, ". " ).replace( "\n", "<br />" );
 			},
 			/*
 			 * Loads the resource for the feed
@@ -95,18 +124,23 @@
 					});
 			},
 			/*
-			 * Create the list ttem
+			 * Create the list item
 			 */
-			createItem: (function(){
-				var base = $('<li><div class="content"></div><div class="time"><a target="_blank"></a></div></li>');
-					
-				return function(text, time, url){
-					var next = base.clone( true );
-					next.find('.content').html( text );
-					next.find('.time a').html( moment( time ) ).attr( 'href', url );
-					return next;
-				};
-			}())
+			createItem: function( text, time, url ) {
+				return $(template('listitem', {
+					text: text,
+					link: {
+						url: url,
+						text: moment( time )
+					},
+					readmore: {
+						link: {
+							url: url,
+							text: this.options.readMoreText
+						}
+					}
+				}));		
+			}
 		}, 
 		
 		//Sub Implementations
@@ -127,7 +161,7 @@
 				'$4 GMT+0000 $1/$2/$3'
 			]
 		};
-		
+
 		/*
 		 * Function for parsing time
 		 */
@@ -143,6 +177,16 @@
 			} else {
 				return null;
 			}
+		}
+		
+		/*
+		 * Truncate String nearest space
+		 */
+		function truncate( text, length, suffix ) {
+			if( text.length > length ) {
+				return text.slice( 0, text.lastIndexOf( " ", length ) ) + (suffix || "");
+			}
+			return text;
 		}
 		
 		/*
@@ -171,72 +215,6 @@
 			return !!services[name];			
 		}
 
-		/*
-		 * Simple facebook feed
-		 */
-		add("facebook", {
-			/* Timeformat conversion 2010-11-29T05:00:00+0000 ==> 2010/11/29 05:00:00 GMT+0000 */
-			time: 'std',
-			map:function( obj, account ){
-				var ret = [],
-					self = this;
-				obj.data && $.each(obj.data, function(i, fb){
-					var url, text = fb.message || fb.story || fb.name;
-					if ( text ) {
-						url = "https://facebook.com/"+account+"/posts/"+fb.id.split("_")[1];
-						ret.push({
-							'id':fb.id,
-							'text': self.linkify( text, url ), 
-							'time': parseTime( self.time, fb.created_time ),
-							'url': url
-						});	
-						
-					}
-				});
-				return ret;
-			},
-			url: function( account, perPage, pageNo, token ){
-				return "https://graph.facebook.com/"+account+"/posts?limit="+(perPage*pageNo) + (token ? "&access_token=" + token : "");
-			}
-		});
-		
-		/*
-		 * Simple Twitter feed
-		 */
-		add("twitter", {
-			/* Timeformat conversion "Wed Apr 29 08:53:31 +0000 2009" => "Wed, Apr 29 2009 08:53:31 GMT+0000" */	
-			time: 'tweet',
-			map:function( obj, account ){
-				var ret = [],
-					self = this;
-				
-				$.each( obj.results && $.isArray(obj.results) ? obj.results : obj , function(i, tweet){
-					if (tweet.text) {
-						ret.push({
-							'id': tweet.id,
-							'text': self.linkify(tweet.text), 
-							'time': parseTime( self.time, tweet.created_at ),
-							'url':"http://twitter.com/"+account+"/statuses/"+tweet.id_str
-						});						
-					}
-				});
-				
-				return ret;
-			},
-			url: function( account, perPage, pageNo ){
-				return protocol  + "//api.twitter.com/1/statuses/user_timeline.json?screen_name="+account+"&count="+(perPage*pageNo)+"&trim_user=1"
-			}
-		});
-		
-		/*
-		 *	Twitter Search is the same as Twitter API except url. Twitter API is recommended over search
-		 */
-		add( "twittersearch", "twitter", {
-			url: function( query, perPage, pageNo ){
-				return protocol  + "//search.twitter.com/search.json?rpp="+(perPage*pageNo)+"&q="+escape(query)+"&page=1";										
-			}
-		});
-			
 		/*
 		 * Create a new instance of this module
 		 */
@@ -497,15 +475,91 @@
 			}
 			
 			//Turn the Page
-			feed.children().hide().filter( function( index ) {
-				return index < upper && index >= lower;
-			}).show();			
+			pageTurner( feed, upper, lower) 
 			
 			//Store current page index
 			feed.data('curIndex', pageindex);
 		}
 		
-		// Almost Finished.. Let's wrap it up!
+		/*
+		 * Function to turn the page
+		 */
+		function pageTurner( feed, upper, lower) {
+			feed.children().hide().filter( function( index ) {
+				return index < upper && index >= lower;
+			}).fadeIn(200);
+		}
+
+		/* ##### Services */
+		
+		/*
+		 * Simple facebook feed
+		 */
+		add("facebook", {
+			/* Timeformat conversion 2010-11-29T05:00:00+0000 ==> 2010/11/29 05:00:00 GMT+0000 */
+			time: 'std',
+			map:function( obj, account ){
+				var ret = [],
+					self = this;
+				obj.data && $.each(obj.data, function(i, fb){
+					var url, text = fb.message || fb.story || fb.name;
+					if ( text ) {
+						url = "https://facebook.com/"+account+"/posts/"+fb.id.split("_")[1];
+						ret.push({
+							'id':fb.id,
+							'text': self.linkify( text, url ), 
+							'time': parseTime( self.time, fb.created_time ),
+							'url': url
+						});	
+						
+					}
+				});
+				return ret;
+			},
+			url: function( account, perPage, pageNo, token ){
+				return "https://graph.facebook.com/"+account+"/posts?limit="+(perPage*pageNo) + (token ? "&access_token=" + token : "");
+			}
+		});
+		
+		/*
+		 * Simple Twitter feed
+		 */
+		add("twitter", {
+			/* Timeformat conversion "Wed Apr 29 08:53:31 +0000 2009" => "Wed, Apr 29 2009 08:53:31 GMT+0000" */	
+			time: 'tweet',
+			map:function( obj, account ){
+				var ret = [],
+					self = this;
+				
+				$.each( obj.results && $.isArray(obj.results) ? obj.results : obj , function(i, tweet){
+					if (tweet.text) {
+						var url = "http://twitter.com/"+account+"/statuses/"+tweet.id_str;
+						ret.push({
+							'id': tweet.id,
+							'text': self.linkify( tweet.text, url ), 
+							'time': parseTime( self.time, tweet.created_at ),
+							'url':"http://twitter.com/"+account+"/statuses/"+tweet.id_str
+						});						
+					}
+				});
+				
+				return ret;
+			},
+			url: function( account, perPage, pageNo ){
+				return protocol  + "//api.twitter.com/1/statuses/user_timeline.json?screen_name="+account+"&count="+(perPage*pageNo)+"&trim_user=1"
+			}
+		});
+		
+		/*
+		 *	Twitter Search is the same as Twitter API except url. Twitter API is recommended over search
+		 */
+		add( "twittersearch", "twitter", {
+			url: function( query, perPage, pageNo ){
+				return protocol  + "//search.twitter.com/search.json?rpp="+(perPage*pageNo)+"&q="+escape(query)+"&page=1";										
+			}
+		});
+
+		/* ##### Almost Finished */
 		
 		// The plugin init function
 		function pluginInit( options ) {
