@@ -25,7 +25,9 @@
 
 	var module = {id:'socialfeed'},
 
-		exports = global.jQuery.fn,
+		$ = global.jQuery,
+		
+		exports = $.fn,
 
 		defaults = {
 			service: 'twitter', // default service - available options: facebook twitter
