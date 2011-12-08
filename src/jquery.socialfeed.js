@@ -25,7 +25,7 @@
 
 	var module = {id:'socialfeed'},
 
-		exports = $.fn,
+		exports = global.jQuery.fn,
 
 		defaults = {
 			service: 'twitter', // default service - available options: facebook twitter
@@ -577,7 +577,7 @@
 			return this;
 		};
 
-		// Export the plugin
+		// Export the plugin ( $.fn.socialfeed = pluginInit );
 		exports[module.id] = pluginInit;
 
 		// Export the API methods and defaults
