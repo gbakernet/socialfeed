@@ -6,7 +6,7 @@ The strategy with this plugin is to make it easy to use any simple JSON web serv
 
 The plugin comes with three service implementations by default. They are the real Facebook Graph API (User Posts), the real Twitter API (User Timeline) and the real Twitter Search API. 
 It doesn't use YQL (which is cool) or vendor JavaScript SDKs (which are cool). 
-Extending to use YQL is easily through the `$.fn.socialfeed.add()` interface.
+Extending to use YQL is easily done through the `$.fn.socialfeed.add()` interface.
 
 Demo http://nextdigital.github.com/socialfeed
 
