@@ -1,7 +1,12 @@
 Social Feed
 =================
 
-Social Feed is a jQuery plugin that will display live feed updates. By default it works with Facebook User Posts Graph API and Twitter User Timeline API and Twitter Search, but can be extended to almost any type of feed.
+Social Feed is a jQuery plugin that will display live feed updates, in a small widget.
+The strategy with this plugin is to make it easy to use any simple JSON web service to retrieve content. 
+
+The plugin comes with three service implementations by default. They are the real Facebook Graph API (User Posts), the real Twitter API (User Timeline) and the real Twitter Search API. 
+It doesn't use YQL (which is cool) or vendor JavaScript SDKs (which are cool). 
+Extending to use YQL is easily through the `$.fn.socialfeed.add()` interface.
 
 Demo http://nextdigital.github.com/socialfeed
 
@@ -17,6 +22,15 @@ Twitter Example
 $('#feed').socialfeed({
 	service: "twitter",
 	account: "twitter"
+});
+```
+
+Twitter Search Example
+
+``` js
+$('#feed').socialfeed({
+	service: "twittersearch",
+	account: "#cats"
 });
 ```
 
@@ -49,6 +63,18 @@ $('#feed').socialfeed({
 	error:  function() {
 		// Error
 	}
+});
+```
+
+Don't want pagination. Easy!
+
+``` js
+$('#feed').socialfeed({
+	service: "twitter",
+	account: "twitter"
+	// Pagination is omitted if there is only one page!
+	totalPages: 1,
+	messagesPerPage: 10,
 });
 ```
 
