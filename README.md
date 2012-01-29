@@ -34,13 +34,13 @@ $('#feed').socialfeed({
 });
 ```
 
-Facebook Example ( needs the access token )
+Facebook Example ( needs an access token )
 
 ``` js
 $('#feed').socialfeed({
 	service: "facebook",
 	account: "facebook",
-	token: "OAuthTokenGoesHere"
+	token: "OAuthTokenGoesHere" // offline_access token.
 });
 ```
 
