@@ -20,6 +20,8 @@
 			xhrType : 'json',
 			url: "fb-sample.js" 
 		});
+		
+		$.fn.socialfeed.defaults.cacheTimeout = 2e4 //demo 20 second cache
 
 		$(document).ready(function() {
 
@@ -63,6 +65,7 @@
 <body>
 	<h1>Social Feed Demo</h1>
 	<p>See the <a href="custom.html">custom feed demo</a></p>
+	<p><em>localStorage</em> set to 20 seconds for this demo.</p>	<hr />
 	<hr />	
 	<h2>Facebook (requires OAuth token)</h2>
 	<div class="facebookfeeds"></div>
