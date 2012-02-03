@@ -189,8 +189,12 @@ $(document).ready(function(){
 			}
 		});		
 	});
+
+	// TODO - cache tests
 		
 	function mock() {
+		$.fn.socialfeed.defaults.cacheTimeout = 0 // No cache by default
+		
 		$.fn.socialfeed.add("mockAjax", {
 			xhrType: "json",
 			url: "static/local.js?" + (new Date).getTime(),
