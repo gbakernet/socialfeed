@@ -24,6 +24,8 @@
 	define(["jquery"], function( $ ){
 
 	var module = {id:'socialfeed'},
+	
+		now = (new Date()).getTime(),
 
 		$ = global.jQuery,
 		
@@ -42,14 +44,50 @@
 			maxCharText: '... ',
 			pagePrevLabel: 'Prev',
 			pageNextLabel: 'Next',
-			pageLabel: '{0}'
+			pageLabel: '{0}',
+			cacheTimeout: 1e3*60*15
 		},
 		
 		// Locals
 		protocol = document.location.protocol,
 		rLink = /(href="|<a.*?>)?[A-Za-z]+:\/\/[A-Za-z0-9-_]+\.[A-Za-z0-9-_:%&\?\/.=]+/g,
 		rStop = /[.]?\s?$/i,
+
+		/*
+		 * Store feeds in localStorage, or just mess around with a non-persistant object <= IE7.
+		 */
+		cache = (function( storage, isJSON ) {
+			var cached = {};
+			
+			// Forget is if there is no JSON.parse nor JSON.stringify
+			if( isJSON ) {
+				var cached = storage[module.id];
 				
+				cached = $.type( cached ) === 'string' ? JSON.parse( cached ) : {};
+				
+				function save() {
+					storage[module.id] = JSON.stringify( cached );
+				}
+				
+				$(window).bind('unload', save);
+			}
+			
+			// Return the cache worker
+			return {
+				get: isJSON ? function( key, timeout ) {
+					var item = cached[ key ] || {};
+					return item.when && (item.when + timeout > now ) ? item.response : false;
+				} : $.noop,
+				set: isJSON ? function( key, data ) {
+					if( !cached[ key ] || cached[ key ].when !== data.when ) {
+						cached[ key ] = { when: now, response: data};
+					}
+				} : $.noop
+			};			
+			
+		}(window.localStorage || {}, !!window.JSON)),
+
+		
 		/*
 		 * Simple Template Helper Function
 		 */
@@ -104,7 +142,8 @@
 			load: function( finished ){
 				var self = this,
 					options = self.options,
-					ajaxOptions = { dataType: self.xhrType || 'jsonp' };
+					ajaxOptions = { dataType: self.xhrType || 'jsonp' },
+					fetch;
 					
 				//Prepare Loading content.
 				self.feed.empty().append('<li class="loading">' + options.loadingText + '</li>');
@@ -115,15 +154,21 @@
 									this.url;
 
 				//Fetch data with JSONP:XHR			
-				fetch = $.ajax( ajaxOptions );
 				
-				//Success
-				$.when( fetch )
-					.done( function( data ) {
-						finished( self, data );
-					}).fail( function( data, e ) {
-						finished( self, false );
-					});
+				if( fetch = cache.get( ajaxOptions.url, self.options.cacheTimeout ) ) {
+					finished( self, fetch );
+				} else {
+					fetch =  $.ajax( ajaxOptions );
+				
+					//Success
+					$.when( fetch )
+						.done( function( data ) {
+							cache.set( ajaxOptions.url , data );
+							finished( self, data );
+						}).fail( function( data, e ) {
+							finished( self, false );
+						});				
+				}
 			},
 			/*
 			 * Create the list item
