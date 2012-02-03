@@ -420,6 +420,9 @@
 			return ret;
 		}
 		
+		//Expose now for necessary comparisons
+		moment.now = now;
+		
 		/*
 		 * Generate the HTML for pagination. 
 		 * Not the best templating example. It's on the agenda to refactor this.

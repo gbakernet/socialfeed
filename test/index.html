@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<script src="../lib/jquery.js"></script>
+	<script>var jQueryVersions = [];</script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
+	<script src="../src/jquery.socialfeed.js"></script>
+	<script>jQueryVersions.push( jQuery );</script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js"></script>
+	<script src="../src/jquery.socialfeed.js"></script>
+	<script>jQueryVersions.push( jQuery );</script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
+	<script src="../src/jquery.socialfeed.js"></script>
+	<script>jQueryVersions.push( jQuery );</script>
+	
 	<link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
 	<script type="text/javascript" src="qunit.js"></script>
 	<script type="text/javascript" src="tests.js"></script>
-	<script type="text/javascript" src="../src/jquery.socialfeed.js"></script>
 </head>
 <body>
 	<h1 id="qunit-header">QUnit example</h1>
