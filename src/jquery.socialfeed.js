@@ -1,5 +1,5 @@
-/* 
- * Social Feed - version: 0.1.1
+/*!
+ * Social Feed - version: @VERSION
  * https://github.com/nextdigital/socialfeed
  *
  * Copyright (c) 2011 Next Digital Group Pty Ltd
