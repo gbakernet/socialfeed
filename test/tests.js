@@ -191,11 +191,54 @@ $.each( jQueryVersions, function(i, $) {
 				}
 			});		
 		});
+		
+		test("Plugin - Test 5 (cache)", function() {
+			expect(4);
+			
+			function go() {
+				//enable cache for this test
+				$.fn.socialfeed.defaults.cacheTimeout = 2e4;
+				firstTest();
+			}
+			
+			function firstTest() {
+				ajaxCounter = 0;
+				var social5 = $('#social5');		
+				stop();
+				social5.socialfeed({
+					service: "mockAjax",
+					success: function() {				
+						equals( social5.selector, '#social5', "returns this");
+						equals( social5.find('.jsf-items > li').length, 6, "There is length" );
+						secondTest();
+					}
+				});
+			}
 
-		// TODO - cache tests
+			function secondTest() {
+				ajaxCounter = 0;
+				var social6 = $('#social6');		
+				social6.socialfeed({
+					service: "mockAjax",
+					success: function() {				
+						equals( social6.selector, '#social6', "returns this");
+						equals( social6.find('.jsf-items > li').length, 6, "There is length" );
+						done();
+					}
+				});			
+			}
+			
+			function done() {
+				start();
+				$.fn.socialfeed.defaults.cacheTimeout = -1;
+			}
+			
+			go();			
+
+		});
 			
 		function mock() {
-			$.fn.socialfeed.defaults.cacheTimeout = 0 // No cache by default
+			$.fn.socialfeed.defaults.cacheTimeout = -1 // No cache by default
 			
 			$.fn.socialfeed.add("mockAjax", {
 				xhrType: "json",

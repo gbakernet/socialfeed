@@ -57,16 +57,17 @@
 		 * Store feeds in localStorage, or just mess around with a non-persistant object <= IE7.
 		 */
 		cache = (function( storage, isJSON ) {
-			var cached = {};
+			var cached = {},
+				moduleKey = module.id + $.fn.jquery;
 			
 			// Forget is if there is no JSON.parse nor JSON.stringify
 			if( isJSON ) {
-				var cached = storage[module.id];
+				var cached = storage[moduleKey];
 				
 				cached = $.type( cached ) === 'string' ? JSON.parse( cached ) : {};
 				
 				function save() {
-					storage[module.id] = JSON.stringify( cached );
+					storage[moduleKey] = JSON.stringify( cached );
 				}
 				
 				$(window).bind('unload', save);
