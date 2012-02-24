@@ -154,21 +154,36 @@
 									this.url( options.account, options.messagesPerPage * options.totalPages, 1, options.token) : 
 									this.url;
 
-				//Fetch data with JSONP:XHR			
-				
 				if( fetch = cache.get( ajaxOptions.url, self.options.cacheTimeout ) ) {
-					finished( self, fetch );
+					
+					// Process the cached results
+					finished( self, fetch, true );
+					
 				} else {
-					fetch =  $.ajax( ajaxOptions );
+					
+					// Fetch data with JSONP:XHR			
+					fetch = $.ajax( ajaxOptions );
 				
-					//Success
-					$.when( fetch )
-						.done( function( data ) {
+					// Handlers
+					fetch
+						.done( function( data, status ) {
+							
+							// Cache the results
 							cache.set( ajaxOptions.url , data );
-							finished( self, data );
-						}).fail( function( data, e ) {
-							finished( self, false );
-						});				
+							
+							// Process the results
+							finished( self, data, false );
+							
+						})
+						.fail( function( xhr, status ) {
+							
+							// It failed, let's try to serve the cache version from within a day
+							var data = cache.get( ajaxOptions.url, 864e5 );							
+							
+							// 'data' could be an object of cached feed or false
+							finished( self, data, true );
+							
+						});
 				}
 			},
 			/*
@@ -296,7 +311,7 @@
 		/*
 		 * The callback function for the ajax request
 		 */
-		function feedLoaded( feedImpl, data ) {
+		function feedLoaded( feedImpl, data, fromStorage ) {
 
 			//Map the data from the feed over to a feed array
 			var options = feedImpl.options,
@@ -320,19 +335,19 @@
 				feedItems = feedItems.add( feedImpl.createItem( item.text, item.time, item.url ) );
 			});
 			
-			//If there is items, then lets go
+			// If there is items, then lets go
 			if( !!data && feedItems.length  ) {
 
-				//Finish the loading sequence
+				// Finish the loading sequence
 				feed.fadeOut( speed, function() {
 					
-					//Clear it and Add items
+					// Clear it and Add items
 					feed.empty().append( feedItems );							
 
-					//Create pagination
+					// Create pagination
 					pageControls = $( pagination( options, feedItems.length ) )
 					
-					//Check page count
+					// Check page count
 					if( pageControls ) {
 						
 						pageControls
@@ -347,17 +362,19 @@
 						pageControls.find('.page a:eq(0)').trigger('click');
 					}
 
-					//Show feed
+					// Show feed
 					feed.show();
 
-					//Show the box
+					// Show the box
 					container.fadeIn( speed, function() {
 						//Success Callback
 						if( $.isFunction(options.success) ) {
 							options.success.apply(container , []);
 						}
 					});
-				
+					
+					// Add a class to help debug if it was retrived from cache
+					container.toggleClass('jsf-cache-view', fromStorage);				
 				});
 			
 			} else {
