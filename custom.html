@@ -11,10 +11,12 @@
 	.disabled A {color:#ccc;}
 	body {font-family: Arial, "Sans Serif"; font-size:75%;}
 	.jsf-items {width:300px; margin:10px 10px 0px 10px; padding:4px; list-style:none;}
-	.jsf-items li { overflow:hidden; margin:2px; padding:10px; background:#eee; border 1px solid #ccc:}
+	.jsf-items li { overflow:hidden; margin:2px; padding:10px; background:#eee; border:1px solid #000;}
 	.jsf-pagination { width:300px; display:block; text-align:center; margin:0px 10px 10px 10px; padding:4px; list-style:none;}
 	.jsf-pagination li { display:inline; margin:0px; padding:6px 4px;}
+	.readmore {display:none;}
 	.cats .jsf-items li {text-align:center;} 
+	.jsf-cache-view .jsf-items li {border:1px dashed #000;}
 	</style>
 	<script type="text/javascript">
 
@@ -64,8 +66,7 @@
 <body>
 	<h1>Social Feed Demo</h1>
 	<p>See the <a href="feeds.html">normal feed demo</a></p>
-	<p><em>localStorage</em> set to 20 seconds for this demo.</p>	<hr />
-	<hr />
+	<p><em>localStorage</em> set to 20 seconds for this demo (dashed border items were retrieved from <em>localStorage</em>).</p>	<hr />
 	<h2>Flickr Feed</h2>
 	<div id="flickr-feed" class="cats"></div>
 	<hr />
